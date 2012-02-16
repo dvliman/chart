@@ -50,6 +50,11 @@
             load(json); 
         });
 
+        setInterval(function() { 
+         $.getJSON(settings.testing, function(json) {
+           load(json);
+         });
+        }, settings.interval);
       }
    
       /** Format google.DataTable's value to string */

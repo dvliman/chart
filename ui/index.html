@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+		<title>ui</title>
+		<link type="text/css" href="css/smoothness/jquery-ui-1.8.18.custom.css" rel="stylesheet" />	
+		<style type="text/css">
+		 
+		  /*-- the root --*/
+		  #control li:hover a, 
+		  #control a:focus, 
+		  #control a:active {
+		    padding: 7px 7px 7px 7px; 
+		    color:#fff; 
+		    background:#444;
+		    text-decoration:none;  
+      }
+      
+      /*-- the drop down part --*/
+      #control li:hover ul {
+        display:block;  
+      }
+
+      #control li ul {
+		    position: absolute; 
+		    display: none;
+		    border: 1px solid #bbb;
+		    -moz-box-shadow: 0 0 5px #ddd;  
+		    -webkit-box-shadow: 0 0 5px #ddd; 
+		    box-shadow: 0 0 5px #ddd;  
+		    z-index:5000; 
+		  }
+		  
+		  #control ul:hover {
+		    display:block;
+		  }
+     
+		</style>
+		
+		
+		<script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
+		<script type="text/javascript" src="js/jquery-ui-1.8.18.custom.min.js"></script>
+		<script type="text/javascript">
+			$(function(){
+
+				$('#start, #end').datepicker({
+				  changeMonth: true, 
+				  changeYear: true,
+				  showButtonPanel: true
+				});
+
+			});
+		</script>
+
+	</head>
+	<body>
+	
+	<div id="control">
+	  <li>
+	    <a class="menu" href="#">Settings</a>
+	  
+	    <ul>
+	      <label for="start">Start</label>
+	      <input type="text" id="start" name="start">
+        <input type="text" id="end" name="end">
+	      <label for="end">End<label>
+	    </ul>
+	  </li>
+	</div> 
+
+	</body>
+</html>
+
+

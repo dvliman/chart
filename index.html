@@ -10,44 +10,20 @@
       var settings = {
           width: 400
         , height: 240
-        , uri: "data.json"
+  //      , uri: "http://r.staging.onescreen.net/analytics/contentimpression/1202559?start=2012-02-18-0000"
+        , uri: "http://r.staging.onescreen.net/analytics/contentimpression/1202584?start=2012-02-01-0000&end=2012-02-10-0000"
         , el: "graph"
         , title: 'Impression vs Time Line Chart'
         , interval: 2000
-        , testing: "data2.json"
+        , legend: 'none' 
+        , allowHtml: true 
+        , pointSize: 5
       };
      
       function main() {
 
-        var defaults = {
-          legend: 'none'
-        , allowHtml: true
-        , pointSize: 5   
-        };
-        defaults = $.extend({}, settings, defaults);
-
-        var load = function(source){
-
-          var dataTable = new google.visualization.DataTable();
-          dataTable.addColumn('date', 'Date');
-          dataTable.addColumn('number', 'Impressions');
-          
-          for (var i = 0; i < source.length; ++i)
-            dataTable.addRow([new Date(source[i].time), source[i].hits]);
-
-          var formatter = new google.visualization.DateFormat({formatType: 'medium'});
-          formatter.format(dataTable, 0);
-          
-          // http://code.google.com/apis/chart/interactive/docs/customizing_axes.html#Discrete_vs_Continuous
-          var dataView = new google.visualization.DataView(dataTable);
-          dataView.setColumns([{ calc: date_stringify, type: 'string' }, 1 ]);
-
-          var chart = new google.visualization.LineChart(document.getElementById(defaults.el));
-          chart.draw(dataView, defaults);
-        }
-
         $.getJSON(settings.uri, function(json) {
-            load(json); 
+            linechart(json); 
         });
 
       }
@@ -57,6 +33,35 @@
         var formatted = data.getFormattedValue(row, 0); 
         return formatted.substring(0, formatted.indexOf(','));
       }
+
+      /** Generate Line Chart Graph */
+      var linechart = function(source){
+
+        var dataTable = new google.visualization.DataTable();
+        dataTable.addColumn('date', 'Date');
+        dataTable.addColumn('number', 'Impressions');
+        
+        var count = source.count; 
+        var dataPoints = source.dataPoints; 
+        settings.title += "\n Account ID: " + source.accountId;
+        
+        $.each(dataPoints, function (time, hit) {
+          var t = new Date().valueOf(time);
+              t = new Date(t); 
+          dataTable.addRow([t, hit]);
+        });
+        
+        // http://code.google.com/apis/chart/interactive/docs/customizing_axes.html#Discrete_vs_Continuous
+        var formatter = new google.visualization.DateFormat({formatType: 'medium'});
+        formatter.format(dataTable, 0);
+    
+        var dataView = new google.visualization.DataView(dataTable);
+        dataView.setColumns([{ calc: date_stringify, type: 'string' }, 1 ]);
+
+        var chart = new google.visualization.LineChart(document.getElementById(settings.el));
+        chart.draw(dataView, settings);
+      }
+      
     </script>
   </head>
 

@@ -2,48 +2,116 @@
   <head>
     <script src="jquery-1.7.1.min.js" type="text/javascript"></script>
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <style type="text/css"> 
+      .control {
+        text-align:left; 
+      }
+    </style>
     <script type="text/javascript">
 
-      google.load('visualization', '1.0', {'packages':['corechart', 'charteditor']});
+      google.load('visualization', '1.0', {'packages':['corechart']});
       google.setOnLoadCallback(main);
 
       var settings = {
-          width: 400
-        , height: 240
-  //      , uri: "http://r.staging.onescreen.net/analytics/contentimpression/1202559?start=2012-02-18-0000"
-        , uri: "http://r.staging.onescreen.net/analytics/contentimpression/1202584?start=2012-02-01-0000&end=2012-02-10-0000"
+          width: 650
+        , height: 400
+        , uri: "http://r.staging.onescreen.net/analytics/contentimpression/1202584"
         , el: "graph"
         , title: 'Impression vs Time Line Chart'
-        , interval: 2000
         , legend: 'none' 
         , allowHtml: true 
         , pointSize: 5
       };
-     
+
       function main() {
+        // by default, show 7 days data
+        var mode, start, end; 
 
-        $.getJSON(settings.uri, function(json) {
-            linechart(json); 
+        end = new Date(2012, 02, 9); 
+        start = add_days(end, -7);
+        
+        var query = construct_query(start, end);
+        load(query);
+
+        $("#prev").click(function() {
+          end = start; 
+          start = add_days(end, -7);
+
+          var query = construct_query(start, end); 
+          load(query);
         });
-
+          
+        $("#next").click(function() {
+          start = end; 
+          end = add_days(start, 7);
+          
+          var query = construct_query(start, end); 
+          load(query);
+        });
+        
+        $("#today").click(function() {
+          end = new Date(2012, 02, 9); 
+          start = add_days(end, -7);
+          
+          var query = construct_query(start, end);
+          load(query);
+        });
+      }
+      
+      /** Add/ Substract days from a Date
+       *    Accepts {Date} 
+       *    Returns {Date} 
+       *  To add, use positive integer
+       *  To substract, use negative integer
+       */  
+      var add_days = function(date, days) {
+        var result = new Date(date);
+        result.setDate(date.getDate() + days); 
+        return result;
+      }
+      
+      /** Generate a specific date string format to the server
+       *    Accepts {Date} 
+       *    Returns {String} i.e. 2012-2-2-0000
+       */  
+      var date_format = function(date) {
+        var query = date.getFullYear() + "-" + date.getMonth() + "-" + date.getDate() + "-0000";  
+        return query;
+      }
+      
+      /** Construct the query string to the server
+       *    Accepts {Date} start
+       *            {Date} end
+       *    Returns {String} url
+       */  
+      var construct_query = function(start_date, end_date) {
+        var start = date_format(start_date); 
+        var end = date_format(end_date);
+        return settings.uri + "?start=" + start + "&end=" + end;
       }
    
-      /** Format google.DataTable's value to string */
-      function date_stringify(data, row) {
-        var formatted = data.getFormattedValue(row, 0); 
-        return formatted.substring(0, formatted.indexOf(','));
+      /** Query the json data and generate line chart graph */
+      var load = function(query) {
+        $.getJSON(query, function (json) {
+          if (json === null) {
+            $("#" +settings.el).text("Error: No data!");
+            return;
+          }
+          linechart(json); 
+        });
       }
 
-      /** Generate Line Chart Graph */
+      /** Generate Line Chart Graph 
+       *    Accepts {json} data 
+       */
       var linechart = function(source){
-
+        
         var dataTable = new google.visualization.DataTable();
         dataTable.addColumn('date', 'Date');
         dataTable.addColumn('number', 'Impressions');
         
         var count = source.count; 
         var dataPoints = source.dataPoints; 
-        settings.title += "\n Account ID: " + source.accountId;
         
         $.each(dataPoints, function (time, hit) {
           var t = new Date().valueOf(time);
@@ -51,7 +119,6 @@
           dataTable.addRow([t, hit]);
         });
         
-        // http://code.google.com/apis/chart/interactive/docs/customizing_axes.html#Discrete_vs_Continuous
         var formatter = new google.visualization.DateFormat({formatType: 'medium'});
         formatter.format(dataTable, 0);
     
@@ -62,10 +129,25 @@
         chart.draw(dataView, settings);
       }
       
+      /** Format google.DataTable's value to string 
+       *    Accepts {Google Data Table}
+       *            {Row index}
+       *  http://code.google.com/apis/chart/interactive/docs/customizing_axes.html#Discrete_vs_Continuous
+       */
+      var date_stringify = function(data, row) {
+        var formatted = data.getFormattedValue(row, 0); 
+        console.log(formatted);
+        return formatted.substring(0, formatted.indexOf(','));
+      }
     </script>
   </head>
 
-  <body>
+  <body> 
+    <div class="control">
+      <button id="prev">Prev</button>
+      <button id="next">Next</button>
+      <button id="today">Today</button>
+    </div>
     <div id="graph"></div>
   </body>
 </html>

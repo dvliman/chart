@@ -9,8 +9,8 @@
     </style>
     <script type="text/javascript">
 
-      google.load('visualization', '1.0', {'packages':['corechart']});
-      google.setOnLoadCallback(main);
+      google.load('visualization', '1.0', {'packages':['corechart', 'charteditor']});
+      google.setOnLoadCallback(wrapper);
 
       var settings = {
           width: 940
@@ -139,6 +139,26 @@
         var formatted = data.getFormattedValue(row, 0); 
         return formatted.substring(0, formatted.indexOf(','));
       }
+      
+      var wrapper;
+      function wrapper() {
+        wrapper = new google.visualization.ChartWrapper({
+            chartType: 'LineChart'
+          , dataSourceUrl: 'https://spreadsheets.google.com/spreadsheet/tq?key=tnxuU73jT7eIL-aZke85e3A&pub=1&range=A1:E13'
+          , containerId: settings.el
+          , options: settings
+        });
+        wrapper.draw();
+      }
+      
+      function openEditor(){
+        var editor = new google.visualization.ChartEditor();
+        google.visualization.events.addListener(editor, 'ok', function() {
+          wrapper = editor.getChartWrapper();
+          wrapper.draw(document.getElementById('graph'));
+        });
+        editor.openDialog(wrapper);
+      } 
     </script>
   </head>
 
@@ -147,6 +167,7 @@
       <button id="prev">Prev</button>
       <button id="next">Next</button>
       <button id="today">Today</button>
+      <button id="editor" onclick="openEditor()">Settings</button>
     </div>
     <div id="graph"></div>
   </body>

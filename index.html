@@ -19,9 +19,12 @@
         , el: "graph"
         , title: 'Impression vs Time Line Chart'
         , legend: 'none' 
+        , chartType: 'LineChart'
         , allowHtml: true 
         , pointSize: 5
       };
+      
+      var wrapper; // Google Chartwrapper object
 
       function main() {
         // by default, show 7 days data
@@ -98,18 +101,19 @@
             $("#" +settings.el).text("Error: No data!");
             return;
           }
-          linechart(json); 
+          var data_table = create_datatable(json); 
         });
       }
-
-      /** Generate Line Chart Graph 
-       *    Accepts {json} data 
-       */
-      var linechart = function(source){
-        
-        var dataTable = new google.visualization.DataTable();
-        dataTable.addColumn('date', 'Date');
-        dataTable.addColumn('number', 'Impressions');
+      
+      /** Convert Json data retrieved from the server to 
+       *  Google's DataView object 
+       *    Accept: {json} source
+       *    Return: {DataView} dw 
+       */     
+      var create_datatable = function(source) {
+        var dt = new google.visualization.DataTable();
+        dt.addColumn('date', 'Date');
+        dt.addColumn('number', 'Impressions');
         
         var count = source.count; 
         var dataPoints = source.dataPoints; 
@@ -117,40 +121,36 @@
         $.each(dataPoints, function (time, hit) {
           var t = new Date().valueOf(time);
               t = new Date(t); 
-          dataTable.addRow([t, hit]);
+          dt.addRow([t, hit]);
         });
-        
-        var formatter = new google.visualization.DateFormat({formatType: 'medium'});
-        formatter.format(dataTable, 0);
-    
-        var dataView = new google.visualization.DataView(dataTable);
-        dataView.setColumns([{ calc: date_stringify, type: 'string' }, 1 ]);
 
-        var chart = new google.visualization.LineChart(document.getElementById(settings.el));
-        chart.draw(dataView, settings);
+        var formatter = new google.visualization.DateFormat({formatType: 'medium'});
+        formatter.format(dt, 0);
+    
+        var dataView = new google.visualization.DataView(dt);
+        dataView.setColumns([{ calc: date_stringify, type: 'string' }, 1 ]);
       }
       
+      var generate_wrapper = function(data_view) {
+        wrapper = new google.visualization.ChartWrapper({
+            chartType: settings.chartType;
+          , dataType: data_view
+          , containerId: settings.el
+          , options: settings
+        });
+        
+        wrapper.draw();
+      }
       /** Format google.DataTable's value to string 
-       *    Accepts {Google Data Table}
-       *            {Row index}
+       *    Accept: {Google Data Table} data
+       *            {Row index} row
        *  http://code.google.com/apis/chart/interactive/docs/customizing_axes.html#Discrete_vs_Continuous
        */
       var date_stringify = function(data, row) {
         var formatted = data.getFormattedValue(row, 0); 
         return formatted.substring(0, formatted.indexOf(','));
       }
-      
-      var wrapper;
-      function wrapper() {
-        wrapper = new google.visualization.ChartWrapper({
-            chartType: 'LineChart'
-          , dataSourceUrl: 'https://spreadsheets.google.com/spreadsheet/tq?key=tnxuU73jT7eIL-aZke85e3A&pub=1&range=A1:E13'
-          , containerId: settings.el
-          , options: settings
-        });
-        wrapper.draw();
-      }
-      
+
       function openEditor(){
         var editor = new google.visualization.ChartEditor();
         google.visualization.events.addListener(editor, 'ok', function() {

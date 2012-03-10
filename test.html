@@ -36,7 +36,7 @@
           'controlType': 'NumberRangeFilter',
           'containerId': 'filter_div',
           'options': {
-            'filterColumnLabel': 'Donuts eaten'
+            'filterColumnLabel': 'Brazil'
           }
         });
 
@@ -44,6 +44,8 @@
         var pieChart = new google.visualization.ChartWrapper({
           'chartType': 'PieChart',
           'containerId': 'chart_div',
+          'dataTable': [['Germany', 'USA', 'Brazil', 'Canada', 'France', 'RU'],
+                [700, 300, 400, 500, 600, 800]],
           'options': {
             'width': 300,
             'height': 300,

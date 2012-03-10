@@ -54,18 +54,7 @@
           load(query);
         });
         
-        picker = new google.visualization.ControlWrapper({
-          'controlType': 'CategoryFilter',
-          'containerId': 'picker',
-          'options': {
-            'filterColumnLabel': 'asdf',
-            'ui': {
-              'labelStacking': 'vertical',
-              'allowTyping': false,
-              'allowMultiple': false    
-            }
-          }
-        });
+       
 
       }
       
@@ -120,9 +109,23 @@
             , view: {'columns': [0,1]}
           });
           //cwrapper.draw();
+          
+          picker = new google.visualization.ControlWrapper({
+            'controlType': 'CategoryFilter',
+            'containerId': 'picker',
+            'options': {
+              'filterColumnLabel': 'Mode',
+              'ui': {
+                'labelStacking': 'vertical',
+                'allowTyping': false,
+                'allowMultiple': false    
+              }
+            }
+          });
+          
           dashboard = new google.visualization.Dashboard(document.getElementById('control'));
           dashboard.bind(picker, cwrapper);
-         // dashboard.draw(data);
+          dashboard.draw(data);
         });
       }
       
@@ -135,7 +138,7 @@
         var dt = new google.visualization.DataTable();
         dt.addColumn('date', 'Date');
         dt.addColumn('number', 'Impressions');
-        dt.addColumn('string', "asdf");
+        dt.addColumn('string', "Mode");
         
         var count = source.count; 
         var dataPoints = source.dataPoints; 
@@ -170,13 +173,10 @@
         var editor = new google.visualization.ChartEditor();
         google.visualization.events.addListener(editor, 'ok', function() {
           cwrapper = editor.getChartWrapper();
-          cwrapper.draw(document.getElementById(settings.el));
+          cwrapper.draw(document.getElementById(settings.el), settings);
         });
         editor.openDialog(cwrapper);
       }
-    
-     
-      
 
     </script>
   </head>

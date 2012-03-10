@@ -2,11 +2,6 @@
   <head>
     <script src="jquery-1.7.1.min.js" type="text/javascript"></script>
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-    <style type="text/css"> 
-      .control {
-        text-align:left; 
-      }
-    </style>
     <script type="text/javascript">
 
       google.load('visualization', '1.1', {'packages':['controls', 'corechart', 'charteditor']});
@@ -26,7 +21,9 @@
       };
       
       var cwrapper; // Google Chartwrapper Object. Data Points are stored here
-
+      var dashboard; 
+      var picker; 
+      
       function main() {
         // by default, show 7 days data
         var start, end; 
@@ -56,6 +53,20 @@
           var query = construct_query(start, end);
           load(query);
         });
+        
+        picker = new google.visualization.ControlWrapper({
+          'controlType': 'CategoryFilter',
+          'containerId': 'picker',
+          'options': {
+            'filterColumnLabel': 'asdf',
+            'ui': {
+              'labelStacking': 'vertical',
+              'allowTyping': false,
+              'allowMultiple': false    
+            }
+          }
+        });
+
       }
       
       /** Add/ Substract days from a Date
@@ -98,12 +109,20 @@
             $("#" +settings.el).text("Error: No data!");
             return;
           }
-          var data = create_datatable(json);
-          wrapper(data);
           
-<!--          var dashboard = new google.visualization.Dashboard(document.getElementById(settings.el));-->
-<!--          dashboard.bind(picker, cwrapper);-->
-<!--          dashboard.draw(data);-->
+          var data = create_datatable(json);
+          //console.log(data);
+          cwrapper = new google.visualization.ChartWrapper({
+              chartType: settings.chartType
+            , dataTable: data
+            , containerId: settings.el
+            , options: settings
+            , view: {'columns': [0,1]}
+          });
+          //cwrapper.draw();
+          dashboard = new google.visualization.Dashboard(document.getElementById('control'));
+          dashboard.bind(picker, cwrapper);
+         // dashboard.draw(data);
         });
       }
       
@@ -116,7 +135,7 @@
         var dt = new google.visualization.DataTable();
         dt.addColumn('date', 'Date');
         dt.addColumn('number', 'Impressions');
-        dt.addColumn('string', "datatype");
+        dt.addColumn('string', "asdf");
         
         var count = source.count; 
         var dataPoints = source.dataPoints; 
@@ -136,19 +155,6 @@
         return dataView;
       }
       
-      /** Wrap the data points into Google ChartWrapper so we can display 
-          the same data points using different charts */
-      function wrapper(data) {
-        cwrapper = new google.visualization.ChartWrapper({
-            chartType: settings.chartType
-          , dataTable: data
-          , containerId: settings.el
-          , options: settings
-          , view: {'columns': [0,1]}
-        });
-        cwrapper.draw();
-      }
-      
       /** Format google.DataTable's value to string 
        *    Accept: {Google Data Table} data
        *            {Row index} row
@@ -164,35 +170,26 @@
         var editor = new google.visualization.ChartEditor();
         google.visualization.events.addListener(editor, 'ok', function() {
           cwrapper = editor.getChartWrapper();
-          cwrapper.draw(document.getElementById('graph'));
+          cwrapper.draw(document.getElementById(settings.el));
         });
         editor.openDialog(cwrapper);
       }
     
-<!--      var picker = new google.visualization.ControlWrapper({-->
-<!--        'controlType': 'CategoryFilter',-->
-<!--        'containerId': 'picker',-->
-<!--        'options': {-->
-<!--          'filterColumnLabel': 'datatype',-->
-<!--          'ui': {-->
-<!--            'labelStacking': 'vertical',-->
-<!--            'allowTyping': false,-->
-<!--            'allowMultiple': false    -->
-<!--          }-->
-<!--        }-->
-<!--      });-->
+     
+      
 
     </script>
   </head>
 
   <body> 
-    <div class="control">
+    <div id="control">
       <button id="prev">Prev</button>
       <button id="next">Next</button>
       <button id="today">Today</button>
       <button id="editor" onclick="openEditor()">Settings</button>
       <div id="picker"></div>
+      <div id="graph"></div>
     </div>
-    <div id="graph"></div>
+    
   </body>
 </html>

@@ -9,13 +9,14 @@
     </style>
     <script type="text/javascript">
 
-      google.load('visualization', '1.0', {'packages':['corechart', 'charteditor']});
-      google.setOnLoadCallback(wrapper);
+      google.load('visualization', '1.1', {'packages':['controls', 'corechart', 'charteditor']});
+      google.setOnLoadCallback(main);
 
       var settings = {
           width: 940
         , height: 400
-        , uri: "http://r.staging.onescreen.net/analytics/contentimpression/1202584"
+        , uri: "http://localhost:4567"
+     //   , uri: "http://r.staging.onescreen.net/analytics/contentimpression/1202584"
         , el: "graph"
         , title: 'Impression vs Time Line Chart'
         , legend: 'none' 
@@ -24,12 +25,11 @@
         , pointSize: 5
       };
       
-      var wrapper; // Google Chartwrapper object
+      var cwrapper; // Google Chartwrapper Object. Data Points are stored here
 
       function main() {
         // by default, show 7 days data
-        var mode, start, end; 
-
+        var start, end; 
         end = new Date(2012, 02, 9); 
         start = add_days(end, -7);
         
@@ -39,7 +39,6 @@
         $("#prev").click(function() {
           end = start; 
           start = add_days(end, -7);
-
           var query = construct_query(start, end); 
           load(query);
         });
@@ -47,7 +46,6 @@
         $("#next").click(function() {
           start = end; 
           end = add_days(start, 7);
-          
           var query = construct_query(start, end); 
           load(query);
         });
@@ -55,7 +53,6 @@
         $("#today").click(function() {
           end = new Date(2012, 02, 9); 
           start = add_days(end, -7);
-          
           var query = construct_query(start, end);
           load(query);
         });
@@ -94,34 +91,40 @@
         return settings.uri + "?start=" + start + "&end=" + end;
       }
    
-      /** Query the json data and generate line chart graph */
+      /** Get the json data and generate the graph via Google ChartWrapper */
       var load = function(query) {
         $.getJSON(query, function (json) {
           if (json === null) {
             $("#" +settings.el).text("Error: No data!");
             return;
           }
-          var data_table = create_datatable(json); 
+          var data = create_datatable(json);
+          wrapper(data);
+          
+<!--          var dashboard = new google.visualization.Dashboard(document.getElementById(settings.el));-->
+<!--          dashboard.bind(picker, cwrapper);-->
+<!--          dashboard.draw(data);-->
         });
       }
       
       /** Convert Json data retrieved from the server to 
        *  Google's DataView object 
        *    Accept: {json} source
-       *    Return: {DataView} dw 
+       *    Return: {DataView} dataView
        */     
       var create_datatable = function(source) {
         var dt = new google.visualization.DataTable();
         dt.addColumn('date', 'Date');
         dt.addColumn('number', 'Impressions');
+        dt.addColumn('string', "datatype");
         
         var count = source.count; 
         var dataPoints = source.dataPoints; 
         
-        $.each(dataPoints, function (time, hit) {
-          var t = new Date().valueOf(time);
+        $.each(dataPoints, function (){
+          var t = new Date().valueOf(this.time);
               t = new Date(t); 
-          dt.addRow([t, hit]);
+          dt.addRow([t, this.hits, this.type]);
         });
 
         var formatter = new google.visualization.DateFormat({formatType: 'medium'});
@@ -129,18 +132,23 @@
     
         var dataView = new google.visualization.DataView(dt);
         dataView.setColumns([{ calc: date_stringify, type: 'string' }, 1 ]);
+        
+        return dataView;
       }
       
-      var generate_wrapper = function(data_view) {
-        wrapper = new google.visualization.ChartWrapper({
-            chartType: settings.chartType;
-          , dataType: data_view
+      /** Wrap the data points into Google ChartWrapper so we can display 
+          the same data points using different charts */
+      function wrapper(data) {
+        cwrapper = new google.visualization.ChartWrapper({
+            chartType: settings.chartType
+          , dataTable: data
           , containerId: settings.el
           , options: settings
+          , view: {'columns': [0,1]}
         });
-        
-        wrapper.draw();
+        cwrapper.draw();
       }
+      
       /** Format google.DataTable's value to string 
        *    Accept: {Google Data Table} data
        *            {Row index} row
@@ -151,14 +159,29 @@
         return formatted.substring(0, formatted.indexOf(','));
       }
 
+      /** An editor to change different type of chart displays */
       function openEditor(){
         var editor = new google.visualization.ChartEditor();
         google.visualization.events.addListener(editor, 'ok', function() {
-          wrapper = editor.getChartWrapper();
-          wrapper.draw(document.getElementById('graph'));
+          cwrapper = editor.getChartWrapper();
+          cwrapper.draw(document.getElementById('graph'));
         });
-        editor.openDialog(wrapper);
-      } 
+        editor.openDialog(cwrapper);
+      }
+    
+<!--      var picker = new google.visualization.ControlWrapper({-->
+<!--        'controlType': 'CategoryFilter',-->
+<!--        'containerId': 'picker',-->
+<!--        'options': {-->
+<!--          'filterColumnLabel': 'datatype',-->
+<!--          'ui': {-->
+<!--            'labelStacking': 'vertical',-->
+<!--            'allowTyping': false,-->
+<!--            'allowMultiple': false    -->
+<!--          }-->
+<!--        }-->
+<!--      });-->
+
     </script>
   </head>
 
@@ -168,6 +191,7 @@
       <button id="next">Next</button>
       <button id="today">Today</button>
       <button id="editor" onclick="openEditor()">Settings</button>
+      <div id="picker"></div>
     </div>
     <div id="graph"></div>
   </body>

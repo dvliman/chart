@@ -134,7 +134,7 @@
        */     
       var create_datatable = function(source) {
         var dt = new google.visualization.DataTable();
-        dt.addColumn('date', 'Date');
+        dt.addColumn('string', 'Date');
         dt.addColumn('number', 'Impressions');
         dt.addColumn('string', 'Mode');
         
@@ -142,19 +142,19 @@
         var dataPoints = source.dataPoints; 
         
         $.each(dataPoints, function (){
-          var t = new Date().valueOf(this.time);
-              t = new Date(t); 
-          dt.addRow([t, this.hits, this.type]);
+          //var t = new Date().valueOf(this.time);
+          //    t = new Date(t); 
+          dt.addRow([this.time, this.hits, this.type]);
         });
 
-        // apply formatter for "date" data
+        /* apply formatter for "date" data
         var formatter = new google.visualization.DateFormat({formatType: 'medium'});
         formatter.format(dt, 0);
     
         var dataView = new google.visualization.DataView(dt);
         dataView.setColumns([{ calc: date_stringify, type: 'string' }, 0 ]);
-        
-        return dataView;
+        */
+        return dt;
       }
       
       /** Format google.DataTable's value to string 

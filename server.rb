@@ -23,11 +23,11 @@ stub = <<eos
 {
   "accountID": "123",
   "count": "4", 
-  "dataPoints": [ {"time": "1328072400", "hits":2, "type":"Month"},
-                  {"time": "1328115600", "hits":3, "type":"Month"}, 
-                  {"time": "1328119200", "hits":4, "type":"Day"},
-                  {"time": "1328119200", "hits":1, "type":"Day"},
-                  {"time": "1328072300", "hits":12, "type":"Month"}]
+  "dataPoints": [ {"time": "Feb 2", "hits":2, "type":"Month"},
+                  {"time": "Feb 3", "hits":3, "type":"Month"}, 
+                  {"time": "Feb 4", "hits":4, "type":"Day"},
+                  {"time": "Feb 5", "hits":1, "type":"Day"},
+                  {"time": "Feb 6", "hits":12, "type":"Month"}]
 }
 eos
 

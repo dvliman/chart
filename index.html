@@ -53,9 +53,6 @@
           var query = construct_query(start, end);
           load(query);
         });
-        
-       
-
       }
       
       /** Add/ Substract days from a Date
@@ -114,7 +111,8 @@
             'controlType': 'CategoryFilter',
             'containerId': 'picker',
             'options': {
-              'filterColumnLabel': 'Mode',
+              'filterColumnIndex' : 2,
+              //'filterColumnLabel': 'Mode',
               'ui': {
                 'labelStacking': 'vertical',
                 'allowTyping': false,
@@ -138,7 +136,7 @@
         var dt = new google.visualization.DataTable();
         dt.addColumn('date', 'Date');
         dt.addColumn('number', 'Impressions');
-        dt.addColumn('string', "Mode");
+        dt.addColumn('string', 'Mode');
         
         var count = source.count; 
         var dataPoints = source.dataPoints; 
@@ -149,11 +147,12 @@
           dt.addRow([t, this.hits, this.type]);
         });
 
+        // apply formatter for "date" data
         var formatter = new google.visualization.DateFormat({formatType: 'medium'});
         formatter.format(dt, 0);
     
         var dataView = new google.visualization.DataView(dt);
-        dataView.setColumns([{ calc: date_stringify, type: 'string' }, 1 ]);
+        dataView.setColumns([{ calc: date_stringify, type: 'string' }, 0 ]);
         
         return dataView;
       }

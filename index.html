@@ -10,7 +10,8 @@
       var settings = {
           width: 940
         , height: 400
-        , uri: "http://localhost:4567"
+        , uri: "data.json"
+     //   , uri: "http://localhost:4567"
      //   , uri: "http://r.staging.onescreen.net/analytics/contentimpression/1202584"
         , el: "graph"
         , title: 'Impression vs Time Line Chart'
@@ -18,6 +19,7 @@
         , chartType: 'LineChart'
         , allowHtml: true 
         , pointSize: 5
+        , view: {'columns': [0,1]}
       };
       
       var cwrapper; // Google Chartwrapper Object. Data Points are stored here
@@ -56,9 +58,9 @@
       }
       
       /** Add/ Substract days from a Date
-       *    Accepts {Date} date
+       *    @accepts {Date} date
        *            {Integer} days 
-       *    Returns {Date} 
+       *    @returns {Date} 
        *  To add, use positive integer
        *  To substract, use negative integer
        */  
@@ -69,8 +71,8 @@
       }
       
       /** Generate a specific date string format to the server
-       *    Accepts {Date} 
-       *    Returns {String} i.e. 2012-2-2-0000
+       *    @accepts {Date} 
+       *    @returns {String} i.e. 2012-2-2-0000
        */  
       var date_format = function(date) {
         var query = date.getFullYear() + "-" + date.getMonth() + "-" + date.getDate() + "-0000";  
@@ -78,9 +80,9 @@
       }
       
       /** Construct the query string to the server
-       *    Accepts {Date} start
+       *    @accepts {Date} start
        *            {Date} end
-       *    Returns {String} url
+       *    @returns {String} url
        */  
       var construct_query = function(start_date, end_date) {
         var start = date_format(start_date); 
@@ -97,7 +99,7 @@
           }
           
           var data = create_datatable(json);
-          //console.log(data);
+          
           cwrapper = new google.visualization.ChartWrapper({
               chartType: settings.chartType
             , dataTable: data
@@ -105,14 +107,12 @@
             , options: settings
             , view: {'columns': [0,1]}
           });
-          //cwrapper.draw();
           
           picker = new google.visualization.ControlWrapper({
             'controlType': 'CategoryFilter',
             'containerId': 'picker',
             'options': {
-              'filterColumnIndex' : 2,
-              //'filterColumnLabel': 'Mode',
+              'filterColumnLabel': 'Mode',
               'ui': {
                 'labelStacking': 'vertical',
                 'allowTyping': false,
@@ -129,8 +129,8 @@
       
       /** Convert Json data retrieved from the server to 
        *  Google's DataView object 
-       *    Accept: {json} source
-       *    Return: {DataView} dataView
+       *    @accept: {json} source
+       *    @return: {DataView} dataView
        */     
       var create_datatable = function(source) {
         var dt = new google.visualization.DataTable();
@@ -158,7 +158,7 @@
       }
       
       /** Format google.DataTable's value to string 
-       *    Accept: {Google Data Table} data
+       *    @accept: {Google Data Table} data
        *            {Row index} row
        *  http://code.google.com/apis/chart/interactive/docs/customizing_axes.html#Discrete_vs_Continuous
        */
@@ -173,6 +173,7 @@
         google.visualization.events.addListener(editor, 'ok', function() {
           cwrapper = editor.getChartWrapper();
           cwrapper.draw(document.getElementById(settings.el), settings);
+          dashboard.bind(picker, cwrapper);
         });
         editor.openDialog(cwrapper);
       }

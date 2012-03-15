@@ -22,18 +22,25 @@
       
       var cwrapper; // Google Chartwrapper Object. Data Points are stored here
 
+      /** Daily, Weekly, Monthly, Yearly do not "slide" the window time
+       *  The end date, by default, is set to today's date
+       *  The start date, by default, is set to 24 hours or 7 days or 1 month
+       *                                        or 1 year from the end date
+       *  The Next and Prev button "slide" the window time left and right
+       *  
+       *  I ignore precision on purpose. Ie. 31 days/ month vs. 30 days/ month
+      */
       function main() {
 
         var start = new Date(), end = new Date(), mode = "monthly"; 
         
         $("#daily, #weekly, #monthly, #yearly").bind('click', function() {
           mode = $(this).attr('id');
-          end = start;
-  
-          if (mode === 'daily') start = add_hours(start, -24);
-          if (mode === 'weekly') start = add_days(start,-7);
-          if (mode === 'monthly') start = add_days(start, -30);
-          if (mode === 'yearly') start = add_days(start, -365);
+            
+          if (mode === 'daily') start = add_hours(end, -24);
+          if (mode === 'weekly') start = add_days(end,-7);
+          if (mode === 'monthly') start = add_days(end, -30);
+          if (mode === 'yearly') start = add_days(end, -365);
           
           load (construct_query(start, end, mode));        
         });
@@ -104,13 +111,11 @@
       var construct_query = function(start_date, end_date, mode) {
         var start = date_format(start_date); 
         var end = date_format(end_date);
-        return settings.uri + "?start=" + start + "&end=" + end + "&mode=" + mode;
+        return settings.uri + "start=" + start + "&end=" + end + "&mode=" + mode;
       }
    
       /** Get the json data and generate the graph via Google ChartWrapper */
       var load = function(query) {
-        console.log(query);
-        return;
         $.getJSON(query, function (json) {
           if (json === null) {
             $("#" +settings.el).text("Error: No data!");
@@ -131,7 +136,7 @@
       }
       
       /** Convert Json data retrieved from the server to 
-       *  Google's DataView object 
+       *  Google's DataTable object 
        *    @accept: {json} source
        *    @return: {DataView} dataView
        */     

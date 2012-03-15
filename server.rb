@@ -2,12 +2,11 @@
 require 'sinatra' 
 require 'sinatra/reloader'
 require 'json' 
-
+require 'cgi'
 use Rack::Deflater
 
-# stubbing call to google spreadsheet and run it on the localhost
-get '/' do 
 
+before do 
   headers.merge!({
     "cache-control" => "private, max-age=122",
     "content-type" => "application/json; charset=UTF-8",
@@ -18,17 +17,31 @@ get '/' do
     "x-content-type-options" => "nosniff",
     "x-xss-protection" => "1; mode=block"
   })
-response['Access-Control-Allow-Origin'] = '*'
-stub = <<eos 
-{
-  "accountID": "123",
-  "count": "4", 
-  "dataPoints": [ {"time": "Feb 2", "hits":2, "type":"Month"},
-                  {"time": "Feb 3", "hits":3, "type":"Month"}, 
-                  {"time": "Feb 4", "hits":4, "type":"Day"},
-                  {"time": "Feb 5", "hits":1, "type":"Day"},
-                  {"time": "Feb 6", "hits":12, "type":"Month"}]
-}
-eos
-
+  response['Access-Control-Allow-Origin'] = '*'
 end
+
+# stubbing call to google spreadsheet and run it on the localhost
+get '/*' do 
+  count = {:accountID => 123, :count => 4}
+
+  data = [{:time => "Feb 7", :hits => rand(50)},
+          {:time => "Feb 8", :hits => rand(50)},
+          {:time => "Feb 9", :hits => rand(50)},
+          {:time => "Feb 10", :hits => rand(50)},
+          {:time => "Feb 11", :hits => rand(50)},
+          {:time => "Feb 12", :hits => rand(50)},
+          {:time => "Feb 13", :hits => rand(50)}]
+
+=begin
+  class Array
+    def shuffle!
+      size.downto(1) { |n| push delete_at(rand(n))}
+      self
+    end
+  end
+  data.shuffle!
+=end  
+  count.merge! ({:dataPoints => data})
+  count.to_json
+end
+

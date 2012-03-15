@@ -19,7 +19,6 @@
         , chartType: 'LineChart'
         , allowHtml: true 
         , pointSize: 5
-        , view: {'columns': [0,1]}
       };
       
       var cwrapper; // Google Chartwrapper Object. Data Points are stored here
@@ -59,7 +58,7 @@
       
       /** Add/ Substract days from a Date
        *    @accepts {Date} date
-       *            {Integer} days 
+       *             {Integer} days 
        *    @returns {Date} 
        *  To add, use positive integer
        *  To substract, use negative integer
@@ -81,7 +80,7 @@
       
       /** Construct the query string to the server
        *    @accepts {Date} start
-       *            {Date} end
+       *             {Date} end
        *    @returns {String} url
        */  
       var construct_query = function(start_date, end_date) {
@@ -116,7 +115,7 @@
               'ui': {
                 'labelStacking': 'vertical',
                 'allowTyping': false,
-                'allowMultiple': false    
+                'allowMultiple': false
               }
             }
           });
@@ -159,7 +158,7 @@
       
       /** Format google.DataTable's value to string 
        *    @accept: {Google Data Table} data
-       *            {Row index} row
+       *             {Row index} row
        *  http://code.google.com/apis/chart/interactive/docs/customizing_axes.html#Discrete_vs_Continuous
        */
       var date_stringify = function(data, row) {
@@ -172,7 +171,7 @@
         var editor = new google.visualization.ChartEditor();
         google.visualization.events.addListener(editor, 'ok', function() {
           cwrapper = editor.getChartWrapper();
-          cwrapper.draw(document.getElementById(settings.el), settings);
+          cwrapper.draw();
           dashboard.bind(picker, cwrapper);
         });
         editor.openDialog(cwrapper);

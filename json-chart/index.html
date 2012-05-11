@@ -1,0 +1,44 @@
+<html> 
+  <head>
+    <title>Velocity Engine | Rate Limiting: Impresssion vs time</title>
+    <script type="text/javascript" src="d3.js"></script>
+    <script type="text/javascript" src="d3.time.min.js"></script>
+    <style type="text/css">
+      path {
+        stroke: steelblue; 
+        stroke-width: 2; 
+        fill: none;
+      }
+      line {
+        stroke: black;
+      }
+      text {
+        font-family: Arial;
+        font-size: 9pt;:
+      }
+      path.dot {
+        fill: steelblue; 
+        stroke: steelblue;
+        stroke-width: 0.1;
+      }
+      div.tooltip {
+        background: none repeat scroll 0 0 #4F4F4F;
+        border: 1px solid #2C2929;
+        color: #FAFAFA;
+        font-size: 10px;
+        min-height: 15px;
+        min-width: 80px;
+        padding: 6px;
+        pointer-events: none;
+        position: absolute;
+        text-align: center;
+      }
+    </style>
+  </head>
+
+  <body>
+    <p> Impression vs Time Line Chart </p>
+    <div id="graph"></div>
+    <script type="text/javascript" src="graph.js"></script>
+  </body> 
+</html>
